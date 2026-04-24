@@ -17,8 +17,14 @@ env/
 .python-version
 .vscode
 
+# Bytecode & setuptools metadata (any depth).
+# If __pycache__ or *.egg-info still show in `git status`, they were committed before
+# being ignored — remove from the index only: `git rm -r --cached <path>` then commit.
+**/__pycache__/
 __pycache__/
 *.py[cod]
+*.pyc
+*.pyo
 *$py.class
 *.so
 
@@ -37,6 +43,7 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+**/*.egg-info/
 *.egg-info
 .eggs/
 pip-wheel-metadata/

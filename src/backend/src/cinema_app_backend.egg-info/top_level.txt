@@ -1,4 +1,0 @@
-api
-common
-data_sources
-db
