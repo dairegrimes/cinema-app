@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: cinema-app-backend
+Version: 0.1.0
+Summary: Cinema listings backend (FastAPI, scrapers, DB)
+Requires-Python: >=3.9
+License-File: LICENSE
+Requires-Dist: beautifulsoup4==4.12.3
+Requires-Dist: psycopg2-binary>=2.9.9
+Requires-Dist: SQLAlchemy==2.0.36
+Requires-Dist: fastapi<0.116,>=0.115.6
+Requires-Dist: uvicorn<0.35,>=0.34.0
+Requires-Dist: requests<2.33,>=2.32.3
+Provides-Extra: dev
+Requires-Dist: ruff>=0.9; extra == "dev"
+Dynamic: license-file

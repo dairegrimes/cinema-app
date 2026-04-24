@@ -1,12 +1,14 @@
-from bs4 import BeautifulSoup
 from collections import defaultdict
-from datetime import datetime
-from src.backend.src.common.time_common import get_datetime
-import requests
 from dataclasses import dataclass
-from src.backend.src.db.models.listing import Listing
-from src.backend.src.db.models.movie import Movie
-from src.backend.src.db.models.venue import Venue
+from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup
+
+from common.time_common import get_datetime
+from db.models.listing import Listing
+from db.models.movie import Movie
+from db.models.venue import Venue
 
 # from src.backend.src.db.repo.run import session_maker
 
@@ -54,6 +56,7 @@ for movie in soup.find_all('div', class_='OMP_listingContainer'):
 
 
 from pprint import pprint
+
 pprint(listings)
 
 # session = session_maker()

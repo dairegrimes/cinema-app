@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from sqlalchemy import text
-from src.backend.src.db.repo.db_setup import Base
+from db.repo.db_setup import Base
 from src.backend.src.db.models.listing import Listing
 from src.backend.src.db.models.movie import Movie
 from src.backend.src.db.models.venue import Venue

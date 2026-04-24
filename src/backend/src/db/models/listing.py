@@ -2,7 +2,7 @@ from sqlalchemy import Boolean, BigInteger, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from src.backend.src.db.repo.db_setup import Base
+from db.repo.db_setup import Base
 
 
 class Listing(Base):
