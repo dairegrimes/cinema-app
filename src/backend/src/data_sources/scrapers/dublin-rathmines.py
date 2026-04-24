@@ -10,7 +10,8 @@ from db.models.listing import Listing
 from db.models.movie import Movie
 from db.models.venue import Venue
 
-# from src.backend.src.db.repo.run import session_maker
+# from db.repo.run import session_maker
+
 
 @dataclass
 class ListingDC:
@@ -41,7 +42,6 @@ for movie in soup.find_all('div', class_='OMP_listingContainer'):
         print(movie_title)
         time_divs = movie.find_all("div", class_="OMP_listingDate")
         for div in time_divs:
-            grouped_times = []
             data_date = div.get("data-date")
             for a in div.find_all("a", class_="OMP_buttonSelection"):
                 time = a.find(class_='time')
@@ -58,53 +58,3 @@ for movie in soup.find_all('div', class_='OMP_listingContainer'):
 from pprint import pprint
 
 pprint(listings)
-
-# session = session_maker()
-
-
-# def add_movie(listing):
-#     movie = session.query(Movie).filter_by(name=listing.movie.name).scalar()
-#     if not movie:
-#         movie_object = Movie(name=listing.movie.name)
-#         session.add(movie_object)
-#         session.commit()
-#         return session.query(Movie).filter_by(name=listing.movie.name).scalar()
-#     return movie
-
-
-# for movie_name in movies_list:
-#     movie = session.query(Movie).filter_by(name=movie_name).scalar()
-#     if not movie:
-#         session.add(Movie(name=movie_name))
-#         session.commit()
-
-# id_to_movie_mapping = {movie.name: movie for movie in session.query(Movie).all()}
-# venue = session.query(Venue).filter_by(name='Omniplex Dublin Rathmines').scalar()
-
-# current_ids = set()
-
-
-# def create_listing_id(listing_id):
-#     i = 1
-#     while True:
-#         new_listing_id = f"{listing_id}-{i}"
-#         if new_listing_id not in current_ids:
-#             return new_listing_id
-#         i += 1
-
-
-# for listing in listings:
-#     movie = id_to_movie_mapping[listing.movie]
-#     listing_object = Listing(movie=movie,
-#                              time=listing.time,
-#                              venue=venue,
-#                              maxx=listing.maxx)
-#     listing_id = f"{movie.id}-{venue.id}-{listing_object.time}"
-#     if listing_id not in current_ids:
-#         current_ids.add(listing_id)
-#     else:
-#         listing_id = create_listing_id(listing_id)
-#         current_ids.add(listing_id)
-#     listing_object.listing_id = listing_id
-#     session.add(listing_object)
-# session.commit()

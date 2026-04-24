@@ -1,11 +1,16 @@
-from src.backend.db.repo.run import session_maker
-from src.backend.db.models.listing import Listing
+from sqlalchemy.orm import Session
+
+from db.models.listing import Listing
+from db.models.movie import Movie
+from db.models.venue import Venue
 
 
 class Repo:
-    def __init__(self):
-        pass
+    def get_listings(self, db: Session) -> list[Listing]:
+        return db.query(Listing).all()
 
-    def get_listings(self):
-        session = session_maker()
-        return session.query(Listing).all()
+    def get_movies(self, db: Session) -> list[Movie]:
+        return db.query(Movie).all()
+
+    def get_venues(self, db: Session) -> list[Venue]:
+        return db.query(Venue).all()
