@@ -1,6 +1,80 @@
-.venv/
+# =============================================================================
+# cinema-app — root .gitignore
+# Patterns here apply to the whole repo. Nested projects may also use their
+# own .gitignore (e.g. src/frontend/cinema/.gitignore for Next.js specifics).
+# Docs: https://git-scm.com/docs/gitignore
+# =============================================================================
+
+# --- Secrets & local config (never commit real credentials) -----------------
 .env
+.env.*
+!.env.example
 
-.vscode/
+# --- Python (backend, scripts, tools) ----------------------------------------
+.venv/
+venv/
+env/
+.python-version
 
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+.coverage
+.coverage.*
+htmlcov/
+*.cover
+.hypothesis/
+
+dist/
+build/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+*.egg
+
+# --- Node / frontend (covers any package.json workspace) --------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- OS & editor noise --------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+*~
+*.swp
+*.swo
+*.tmp
+*.temp
+*.log
+
+# --- IDEs --------------------------------------------------------------------
+.idea/
+*.iml
+
+# Ignore personal VS Code state; allow shared workspace config to be committed.
+# Remove the two "!" lines below if you prefer everything under .vscode/ local-only.
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# --- Docker / local volumes (if you add bind-mount dirs later) --------------
+# postgres_data/   # only if you ever use a bind mount named this at repo root
+
+# --- Misc --------------------------------------------------------------------
+*.local
+.cache/
