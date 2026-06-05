@@ -1,0 +1,6 @@
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+PYTHONPATH=/app
+
+# Daily scrape at 06:00 and 18:00 Dublin time
+0 6,18 * * * cd /app && python -m jobs.scrape_all >> /var/log/scrape.log 2>&1

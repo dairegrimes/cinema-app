@@ -31,5 +31,5 @@ src = ["src/backend/src"]
 select = ["I"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["api", "common", "data_sources", "db", "src"]
+known-first-party = ["api", "common", "data_sources", "db", "jobs", "src"]
 split-on-trailing-comma = true
