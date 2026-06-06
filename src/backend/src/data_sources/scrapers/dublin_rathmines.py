@@ -1,3 +1,4 @@
+import re
 import time
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -8,8 +9,15 @@ from bs4 import BeautifulSoup
 from common.time_common import get_datetime
 
 VENUE_NAME = "Omniplex Dublin Rathmines"
-URL = "https://www.omniplex.ie/cinema/dublin-rathmines"
+SITE_CODE = "OMP_RATH"
+SHOWTIMES_URL = "https://www.omniplex.ie/cinema/showtimes"
 SCRAPE_DAYS_AHEAD = 7
+
+_SESSION = requests.Session()
+_SESSION.cookies.set("sitecode", SITE_CODE, domain="www.omniplex.ie")
+
+# e.g. "Scary Movie at 13:40 in MAXX 1"
+_SHOWTIME_ARIA = re.compile(r"^(.+?) at (\d{1,2}:\d{2}) in ", re.IGNORECASE)
 
 
 @dataclass
@@ -20,36 +28,31 @@ class ListingDC:
     maxx: bool
 
 
-def _parse_time(data_date: str, time_str: str) -> datetime:
-    day, month, year = data_date.split('-')
-    hour, minute = time_str.split(':')
-    return get_datetime(int(year), int(month), int(day), int(hour), int(minute))
+def _parse_showtime(target_date: date, time_str: str) -> datetime:
+    hour, minute = time_str.split(":")
+    return get_datetime(target_date.year, target_date.month, target_date.day, int(hour), int(minute))
 
 
 def _scrape_date(target_date: date) -> list[ListingDC]:
-    date_str = target_date.strftime("%d-%m-%Y")
-    response = requests.get(URL, params={"date": date_str}, timeout=30)
+    response = _SESSION.get(
+        SHOWTIMES_URL,
+        params={"action": "processFilters", "filterDate": target_date.strftime("%Y-%m-%d")},
+        timeout=30,
+    )
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
     listings: list[ListingDC] = []
-    for movie in soup.find_all('div', class_=' '):
-        if not movie.find(class_="OMP_buttonSelection"):
+    for link in soup.find_all("a", attrs={"aria-label": True}):
+        match = _SHOWTIME_ARIA.match(link["aria-label"])
+        if not match:
             continue
-        movie_title = movie.find("h3", class_="OMP_inlineBlock").get_text(strip=True)
-        for div in movie.find_all("div", class_="OMP_listingDate"):
-            data_date = div.get("data-date")
-            for a in div.find_all("a", class_="OMP_buttonSelection"):
-                time_tag = a.find(class_='time')
-                time_str = time_tag.contents[0].strip()
-                if 'SoldOut' in time_str:
-                    continue
-                listings.append(ListingDC(
-                    movie=movie_title,
-                    time=_parse_time(data_date, time_str),
-                    venue=VENUE_NAME,
-                    maxx="maxx" in a.get("href", ""),
-                ))
+        listings.append(ListingDC(
+            movie=match.group(1).strip(),
+            time=_parse_showtime(target_date, match.group(2)),
+            venue=VENUE_NAME,
+            maxx="maxx" in link["aria-label"].lower(),
+        ))
     return listings
 
 
@@ -61,8 +64,3 @@ def scrape() -> list[ListingDC]:
         if offset < SCRAPE_DAYS_AHEAD - 1:
             time.sleep(0.5)
     return listings
-
-
-if __name__ == "__main__":
-    listings = scrape()
-    print(listings)

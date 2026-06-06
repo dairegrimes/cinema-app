@@ -14,12 +14,6 @@ export default function Home() {
         </div>
         
         <SearchCard />
-        
-        <div className="mt-16 text-center">
-          <p className="text-sm text-zinc-500 dark:text-zinc-600">
-            More features coming soon...
-          </p>
-        </div>
       </main>
     </div>
   );
