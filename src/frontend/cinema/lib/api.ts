@@ -20,3 +20,31 @@ export function formatListingTime(timestamp: number): string {
     minute: "2-digit",
   }).format(new Date(timestamp * 1000));
 }
+
+export interface SubscriptionResult {
+  status: string;
+  message: string;
+}
+
+export async function createSubscription(input: {
+  email: string;
+  movie_name: string;
+  venue_name?: string;
+}): Promise<SubscriptionResult> {
+  const response = await fetch(`${API_BASE}/subscriptions/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    let detail = `Failed to subscribe (${response.status})`;
+    try {
+      const body = await response.json();
+      if (body?.detail) detail = typeof body.detail === "string" ? body.detail : detail;
+    } catch {
+      // ignore JSON parse errors
+    }
+    throw new Error(detail);
+  }
+  return response.json();
+}

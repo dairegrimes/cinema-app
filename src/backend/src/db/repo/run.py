@@ -1,4 +1,10 @@
-from db.models import listing, movie, venue  # noqa: F401 – registers models with Base
+from db.models import (  # noqa: F401 – registers models with Base
+    listing,
+    movie,
+    sent_alert,
+    subscription,
+    venue,
+)
 from db.repo.db_setup import Base, engine
 
 

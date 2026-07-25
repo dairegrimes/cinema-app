@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy.orm import Session, joinedload
 
 from db.models.listing import Listing
@@ -10,6 +12,7 @@ class Repo:
         return (
             db.query(Listing)
             .options(joinedload(Listing.movie), joinedload(Listing.venue))
+            .filter(Listing.time >= int(time.time()))
             .all()
         )
 

@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import listing
+from api.routes import listing, subscription
 from db.repo.run import init_db
 
 
@@ -25,6 +25,7 @@ app.add_middleware(
 )
 
 app.include_router(listing.router)
+app.include_router(subscription.router)
 
 
 @app.get("/health")

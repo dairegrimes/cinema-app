@@ -1,5 +1,7 @@
 from db.models.listing import Listing
 from db.models.movie import Movie
+from db.models.sent_alert import SentAlert
+from db.models.subscription import Subscription
 from db.models.venue import Venue
 
-__all__ = ["Listing", "Movie", "Venue"]
+__all__ = ["Listing", "Movie", "SentAlert", "Subscription", "Venue"]

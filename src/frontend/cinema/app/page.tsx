@@ -1,9 +1,10 @@
+import AlertForm from "./components/AlertForm";
 import SearchCard from "./components/SearchCard";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black font-sans">
-      <main className="container mx-auto px-4 py-12 md:py-20">
+      <main className="container mx-auto px-4 py-12 md:py-20 space-y-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
             Cinema Listings
@@ -12,8 +13,9 @@ export default function Home() {
             Find the perfect movie showing near you. Search by film, cinema, or browse all listings.
           </p>
         </div>
-        
+
         <SearchCard />
+        <AlertForm />
       </main>
     </div>
   );

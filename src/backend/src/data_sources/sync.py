@@ -34,13 +34,14 @@ def _make_listing_id(venue_name: str, movie_name: str, timestamp: int) -> str:
     return hashlib.sha1(raw.encode()).hexdigest()
 
 
-def sync_listings(db: Session, listings: list[ListingDC]) -> tuple[int, int]:
+def sync_listings(db: Session, listings: list[ListingDC]) -> tuple[int, int, list[Listing]]:
     """Upsert listings into the database.
 
-    Returns (inserted, skipped) counts.
+    Returns (inserted, skipped, new_listings) where new_listings are the
+    Listing objects that were freshly inserted on this run.
     """
-    inserted = 0
     skipped = 0
+    new_listings: list[Listing] = []
     for ldc in listings:
         venue = _get_or_create_venue(db, ldc.venue)
         movie = _get_or_create_movie(db, ldc.movie)
@@ -55,6 +56,6 @@ def sync_listings(db: Session, listings: list[ListingDC]) -> tuple[int, int]:
         listing = Listing(movie=movie, time=ldc.time, venue=venue, maxx=ldc.maxx)
         listing.listing_id = listing_id
         db.add(listing)
-        inserted += 1
+        new_listings.append(listing)
 
-    return inserted, skipped
+    return len(new_listings), skipped, new_listings
