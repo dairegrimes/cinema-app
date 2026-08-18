@@ -16,7 +16,7 @@ COPY src/backend/src /app
 COPY src/backend/crontab /etc/cron.d/cinema-scrape
 RUN chmod 0644 /etc/cron.d/cinema-scrape \
     && crontab /etc/cron.d/cinema-scrape \
-    && touch /var/log/scrape.log
+    && touch /var/log/scrape.log /var/log/cleanup.log
 
 ENV PYTHONPATH=/app
 

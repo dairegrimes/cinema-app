@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f /Users/dairegrimes/.npm/_npx/6f4879659183bc49/verify_day_toggle.mjs)",
+      "Bash(curl -s http://localhost:8000/listings/)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('listings remaining:', len\\(d\\)\\)\")",
+      "Bash(aws sts *)",
+      "Bash(terraform -version)"
+    ],
+    "additionalDirectories": [
+      "/Users/dairegrimes/.npm/_npx/6f4879659183bc49"
+    ]
+  }
+}

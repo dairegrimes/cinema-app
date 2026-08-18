@@ -4,3 +4,6 @@ PYTHONPATH=/app
 
 # Daily scrape at 06:00 and 18:00 Dublin time
 0 6,18 * * * cd /app && python -m jobs.scrape_all >> /var/log/scrape.log 2>&1
+
+# Daily cleanup of completed listings at 04:00 Dublin time
+0 4 * * * cd /app && python -m jobs.cleanup_listings >> /var/log/cleanup.log 2>&1

@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { fetchListings, formatListingTime } from '@/lib/api';
+import {
+  fetchListings,
+  formatListingClockTime,
+  formatListingDayLabel,
+  formatListingTime,
+  getListingDayKey,
+} from '@/lib/api';
 import type { Listing } from '@/lib/types';
 
 interface SearchFilters {
@@ -55,6 +61,48 @@ export default function SearchCard() {
       return haystack.includes(query);
     });
   }, [listings, filters]);
+
+  const listingsByDay = useMemo(() => {
+    const map = new Map<string, Listing[]>();
+    for (const listing of filteredListings) {
+      const key = getListingDayKey(listing.time);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(listing);
+    }
+    return map;
+  }, [filteredListings]);
+
+  const days = useMemo(() => [...listingsByDay.keys()].sort(), [listingsByDay]);
+
+  const [selectedDay, setSelectedDay] = useState('');
+
+  useEffect(() => {
+    if (days.length > 0 && !days.includes(selectedDay)) {
+      setSelectedDay(days[0]);
+    }
+  }, [days, selectedDay]);
+
+  const movieGroupsForDay = useMemo(() => {
+    const dayListings = listingsByDay.get(selectedDay) ?? [];
+    const byMovie = new Map<string, Map<string, Listing[]>>();
+    for (const listing of dayListings) {
+      if (!byMovie.has(listing.movie)) byMovie.set(listing.movie, new Map());
+      const byVenue = byMovie.get(listing.movie)!;
+      if (!byVenue.has(listing.venue)) byVenue.set(listing.venue, []);
+      byVenue.get(listing.venue)!.push(listing);
+    }
+    return [...byMovie.entries()]
+      .map(([movie, byVenue]) => ({
+        movie,
+        venues: [...byVenue.entries()]
+          .map(([venue, showings]) => ({
+            venue,
+            showings: [...showings].sort((a, b) => a.time - b.time),
+          }))
+          .sort((a, b) => a.venue.localeCompare(b.venue)),
+      }))
+      .sort((a, b) => a.movie.localeCompare(b.movie));
+  }, [listingsByDay, selectedDay]);
 
   const handleSearch = () => {
     setFilters({
@@ -179,42 +227,85 @@ export default function SearchCard() {
 
       {!loading && !error && (
         <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-6 md:p-8">
-          <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
-            {filteredListings.length} showing{filteredListings.length === 1 ? '' : 's'}
-          </h3>
-
           {filteredListings.length === 0 ? (
-            <p className="text-zinc-500 dark:text-zinc-400">
-              No listings match your search.
-            </p>
+            <>
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
+                0 showings
+              </h3>
+              <p className="text-zinc-500 dark:text-zinc-400">
+                No listings match your search.
+              </p>
+            </>
           ) : (
-            <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {filteredListings.map((listing) => (
-                <li
-                  key={listing.id}
-                  className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-                >
-                  <div>
+            <>
+              <div className="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-1 px-1">
+                {days.map((day) => {
+                  const dayListings = listingsByDay.get(day)!;
+                  const isSelected = day === selectedDay;
+                  return (
+                    <button
+                      key={day}
+                      onClick={() => setSelectedDay(day)}
+                      className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                        isSelected
+                          ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {formatListingDayLabel(dayListings[0].time)}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
+                {movieGroupsForDay.reduce(
+                  (sum, group) =>
+                    sum + group.venues.reduce((s, v) => s + v.showings.length, 0),
+                  0,
+                )}{' '}
+                showing
+                {movieGroupsForDay.reduce(
+                  (sum, group) =>
+                    sum + group.venues.reduce((s, v) => s + v.showings.length, 0),
+                  0,
+                ) === 1
+                  ? ''
+                  : 's'}
+              </h3>
+
+              <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                {movieGroupsForDay.map((group) => (
+                  <li key={group.movie} className="py-4 space-y-3">
                     <p className="font-medium text-zinc-900 dark:text-zinc-50">
-                      {listing.movie}
+                      {group.movie}
                     </p>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      {listing.venue}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <time className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                      {formatListingTime(listing.time)}
-                    </time>
-                    {listing.maxx && (
-                      <span className="text-xs font-semibold uppercase tracking-wide px-2 py-1 rounded bg-yellow-400 text-black">
-                        MAXX
-                      </span>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                    {group.venues.map((v) => (
+                      <div key={v.venue} className="pl-1">
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1.5">
+                          {v.venue}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {v.showings.map((listing) => (
+                            <span
+                              key={listing.id}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                            >
+                              <time>{formatListingClockTime(listing.time)}</time>
+                              {listing.maxx && (
+                                <span className="text-xs font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-yellow-400 text-black">
+                                  MAXX
+                                </span>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       )}
